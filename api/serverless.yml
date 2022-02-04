@@ -1,0 +1,49 @@
+service: code-test-api
+frameworkVersion: "2"
+useDotenv: true
+
+provider:
+  apiGateway:
+    minimumCompressionSize: 1024
+    shouldStartNameWithService: true
+  environment: ${file(env.yml):${self:provider.stage}}
+  httpApi:
+    cors: true
+  lambdaHashingVersion: "20201221"
+  name: aws
+  runtime: nodejs14.x
+  region: ${opt:region, "us-east-1"}
+  stackTags:
+    Environment: ${self:provider.stage}
+    Name: ${self:service}-${self:provider.stage}
+  stage: ${opt:stage, "local"}
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    keepOutputDirectory: true
+  serverless-offline:
+    ignoreJWTSignature: true
+    httpPort: 5000
+    # useDocker: true # https://github.com/lambci/docker-lambda/issues/329
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+functions:
+  getResults:
+    handler: src/handlers/getResults.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /results
+  postResult:
+    handler: src/handlers/postResult.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /results
+
+resources:

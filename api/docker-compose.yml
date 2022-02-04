@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  mysql:
+    build:
+      context: mysql
+    networks:
+      - net
+    environment:
+      MYSQL_DATABASE: 'code_test'
+      MYSQL_ROOT_PASSWORD: "password1"
+    ports:
+      - '3307:3306'
+    command: "--default-authentication-plugin=mysql_native_password"
+
+networks:
+  net:
+    driver: bridge
